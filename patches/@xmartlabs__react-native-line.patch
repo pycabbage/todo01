@@ -1,0 +1,85 @@
+diff --git a/android/src/main/java/com/xmartlabs/line/LineLoginModule.kt b/android/src/main/java/com/xmartlabs/line/LineLoginModule.kt
+index 875fa1b9268e0020a69d83a1e48fd8606beeb28c..472e079beb255df020014c027f1dc8f62b3243ca 100755
+--- a/android/src/main/java/com/xmartlabs/line/LineLoginModule.kt
++++ b/android/src/main/java/com/xmartlabs/line/LineLoginModule.kt
+@@ -26,7 +26,8 @@ private var LOGIN_REQUEST_CODE: Int = 0
+ enum class LoginArguments(val key: String) {
+     BOT_PROMPT("botPrompt"),
+     ONLY_WEB_LOGIN("onlyWebLogin"),
+-    SCOPES("scopes")
++    SCOPES("scopes"),
++    RAW_NONCE("rawNonce")
+ }
+ 
+ class LineLoginModule(private val reactContext: ReactApplicationContext) :
+@@ -65,10 +66,13 @@ class LineLoginModule(private val reactContext: ReactApplicationContext) :
+             args.hasKey(LoginArguments.ONLY_WEB_LOGIN.key) && args.getBoolean(LoginArguments.ONLY_WEB_LOGIN.key)
+         val botPromptString =
+             if (args.hasKey(LoginArguments.BOT_PROMPT.key)) args.getString(LoginArguments.BOT_PROMPT.key)!! else "normal"
++        val rawNonce =
++            if (args.hasKey(LoginArguments.RAW_NONCE.key)) args.getString(LoginArguments.RAW_NONCE.key) else null
+         login(
+             scopes,
+             onlyWebLogin,
+             botPromptString,
++            rawNonce,
+             promise
+         )
+     }
+@@ -77,6 +81,7 @@ class LineLoginModule(private val reactContext: ReactApplicationContext) :
+         scopes: List<String>,
+         onlyWebLogin: Boolean,
+         botPromptString: String,
++        rawNonce: String?,
+         promise: Promise
+     ) {
+ 
+@@ -84,6 +89,9 @@ class LineLoginModule(private val reactContext: ReactApplicationContext) :
+             .scopes(Scope.convertToScopeList(scopes))
+             .apply {
+                 botPrompt(LineAuthenticationParams.BotPrompt.valueOf(botPromptString))
++                if (rawNonce != null) {
++                    nonce(rawNonce)
++                }
+             }
+             .build()
+ 
+diff --git a/dist/NativeLineLogin.d.ts b/dist/NativeLineLogin.d.ts
+index d6f09bf7036c6539c7f3adb0cc475d9b935b0c29..8e23a926384aed4656e8ee3c0c8dfb55baf9b61c 100644
+--- a/dist/NativeLineLogin.d.ts
++++ b/dist/NativeLineLogin.d.ts
+@@ -34,6 +34,7 @@ export interface LoginParams {
+     botPrompt?: BotPrompt;
+     onlyWebLogin?: boolean;
+     scopes?: LoginPermission[];
++    rawNonce?: string;
+ }
+ export interface UserProfile {
+     /** User's display name. */
+diff --git a/ios/LineLoginModule.swift b/ios/LineLoginModule.swift
+index af3c43f9de91790201dabd254706dce0d1bf6f67..2e80fb0afb60c4e236941e9d0d91d03d2ea05411 100644
+--- a/ios/LineLoginModule.swift
++++ b/ios/LineLoginModule.swift
+@@ -59,6 +59,10 @@ import LineSDK
+       }
+     }
+     
++    if let rawNonce = args["rawNonce"] as? String {
++      parameters.nonce = rawNonce
++    }
++    
+     DispatchQueue.main.async {
+       LoginManager.shared.login(
+         permissions: Set(scopes),
+diff --git a/src/NativeLineLogin.ts b/src/NativeLineLogin.ts
+index 473e4451b88c10c97c2c55df386f8517e7347c7f..84b3caa19924ac970c31c85132b670b630c296f1 100644
+--- a/src/NativeLineLogin.ts
++++ b/src/NativeLineLogin.ts
+@@ -40,6 +40,7 @@ export interface LoginParams {
+   botPrompt?: BotPrompt
+   onlyWebLogin?: boolean
+   scopes?: LoginPermission[]
++  rawNonce?: string
+ }
+ 
+ export interface UserProfile {

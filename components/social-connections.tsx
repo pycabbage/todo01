@@ -52,7 +52,10 @@ export function SocialConnections() {
               } else if (strategy.type === "oauth_github") {
                 // TODO: Authenticate with GitHub
               } else if (strategy.type === "oidc_line") {
-                await lineAuth()
+                const authResult = await lineAuth()
+                if (!authResult?.user) {
+                  return
+                }
               }
             }}
           >

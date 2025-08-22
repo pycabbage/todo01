@@ -11,6 +11,9 @@ patchedDependencies:
   '@react-native-firebase/auth':
     hash: c6641ac80b57a2f7240b111208df6e95cb7fe3e9d57586d76cba32f2c2d041b1
     path: patches/@react-native-firebase__auth.patch
+  '@xmartlabs/react-native-line':
+    hash: 16cce3a155aa2690f9a5201d7759ea87fee18e2f4c9ea3f3570b270183768b42
+    path: patches/@xmartlabs__react-native-line.patch
 
 importers:
 
@@ -66,7 +69,7 @@ importers:
         version: 1.2.0(react-native-web@0.20.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-native@0.79.5(@babel/core@7.28.3)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
       '@xmartlabs/react-native-line':
         specifier: ^5.3.0
-        version: 5.3.0(react-native@0.79.5(@babel/core@7.28.3)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
+        version: 5.3.0(patch_hash=16cce3a155aa2690f9a5201d7759ea87fee18e2f4c9ea3f3570b270183768b42)(react-native@0.79.5(@babel/core@7.28.3)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -5780,7 +5783,7 @@ snapshots:
       '@urql/core': 5.2.0
       wonka: 6.3.5
 
-  '@xmartlabs/react-native-line@5.3.0(react-native@0.79.5(@babel/core@7.28.3)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)':
+  '@xmartlabs/react-native-line@5.3.0(patch_hash=16cce3a155aa2690f9a5201d7759ea87fee18e2f4c9ea3f3570b270183768b42)(react-native@0.79.5(@babel/core@7.28.3)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)':
     dependencies:
       react: 19.0.0
       react-native: 0.79.5(@babel/core@7.28.3)(@types/react@19.0.14)(react@19.0.0)
