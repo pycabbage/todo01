@@ -34,7 +34,6 @@ export async function lineAuth() {
 
     // カスタムnonceを生成
     const customNonce = generateNonce()
-    console.log("[lineAuth] Generated custom nonce:", customNonce)
 
     const lineLoginResult = await Line.login({
       scopes: [
@@ -42,16 +41,11 @@ export async function lineAuth() {
         LoginPermission.Profile,
         LoginPermission.OpenId,
       ],
-      rawNonce: await sha256sum(customNonce), // カスタムnonceを指定
+      rawNonce: await sha256sum(customNonce),
     })
     if (!lineLoginResult.accessToken.idToken) {
       throw new Error("[lineAuth] Line login failed: no idToken")
     }
-
-    console.log(
-      "[lineAuth] Returned nonce from SDK:",
-      lineLoginResult.idTokenNonce
-    )
 
     const credential = (
       OIDCAuthProvider as FirebaseAuthTypes.OIDCProvider
@@ -59,12 +53,10 @@ export async function lineAuth() {
       "line",
       lineLoginResult.accessToken.idToken,
       lineLoginResult.accessToken.accessToken,
-      customNonce // 生成したカスタムnonceを渡す（SDKからのnonceではなく）
+      customNonce
     )
 
-    console.log("[lineAuth] signInWithCredential ...")
     const result = await signInWithCredential(getAuth(), credential)
-    console.log("[lineAuth] signInWithCredential result:", result.user.uid)
     return result
   } catch (error) {
     console.error(error)
