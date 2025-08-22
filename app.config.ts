@@ -1,0 +1,85 @@
+const config = {
+  expo: {
+    name: "todo01",
+    slug: "todo01",
+    version: "1.0.0",
+    orientation: "portrait",
+    icon: "./assets/images/icon.png",
+    scheme: "todo01",
+    userInterfaceStyle: "automatic",
+    newArchEnabled: true,
+    ios: {
+      supportsTablet: true,
+    },
+    android: {
+      adaptiveIcon: {
+        foregroundImage: "./assets/images/adaptive-icon.png",
+        backgroundColor: "#ffffff",
+      },
+      edgeToEdgeEnabled: true,
+      package: "com.tododev.todo01",
+      googleServicesFile: "google-services.json",
+    },
+    web: {
+      bundler: "metro",
+      output: "static",
+      favicon: "./assets/images/favicon.png",
+    },
+    plugins: [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          image: "./assets/images/splash-icon.png",
+          imageWidth: 200,
+          resizeMode: "contain",
+          backgroundColor: "#ffffff",
+        },
+      ],
+      [
+        "expo-build-properties",
+        {
+          android: {
+            compileSdkVersion: 35,
+            targetSdkVersion: 35,
+            buildToolsVersion: "35.0.0",
+            googleServicesFile: "./google-services.json",
+          },
+          ios: {
+            deploymentTarget: "15.1",
+          },
+        },
+      ],
+      [
+        "expo-sqlite",
+        {
+          enableFTS: true,
+          useSQLCipher: true,
+        },
+      ],
+      "@xmartlabs/react-native-line",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      "@react-native-firebase/crashlytics",
+      "@react-native-firebase/app-distribution",
+      "@react-native-firebase/perf",
+      "expo-apple-authentication",
+    ],
+    runtimeVersion: {
+      policy: "appVersion",
+    },
+    platforms: ["ios", "android"],
+    experiments: {
+      typedRoutes: true,
+    },
+    extra: {
+      router: {},
+      eas: {
+        projectId: "0bbc3333-2cae-4de6-88fd-d08242ceb300",
+      },
+    },
+    owner: "dc-higuchi",
+  },
+}
+
+export default config
