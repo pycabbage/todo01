@@ -7,7 +7,8 @@
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "lint": "biome check"
+    "lint": "biome check",
+    "prepare": "husky"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
@@ -43,6 +44,8 @@
     "@babel/core": "^7.25.2",
     "@biomejs/biome": "^2.2.0",
     "@types/react": "~19.0.10",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.5",
     "typescript": "~5.8.3"
   },
   "private": true
