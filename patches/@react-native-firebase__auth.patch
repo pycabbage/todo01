@@ -1,0 +1,224 @@
+diff --git a/android/src/main/java/io/invertase/firebase/auth/ReactNativeFirebaseAuthModule.java b/android/src/main/java/io/invertase/firebase/auth/ReactNativeFirebaseAuthModule.java
+index c52a1bed62c1ae2d9249dc263cc6fda8ecdb5d22..5b060e497105b8aed79ccdc0a6197420f6e657b3 100644
+--- a/android/src/main/java/io/invertase/firebase/auth/ReactNativeFirebaseAuthModule.java
++++ b/android/src/main/java/io/invertase/firebase/auth/ReactNativeFirebaseAuthModule.java
+@@ -895,11 +895,11 @@ class ReactNativeFirebaseAuthModule extends ReactNativeFirebaseModule {
+ 
+   @ReactMethod
+   private void signInWithCredential(
+-      String appName, String provider, String authToken, String authSecret, final Promise promise) {
++      String appName, String provider, String authToken, String authSecret, @Nullable String rawNonce, final Promise promise) {
+     FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+ 
+-    AuthCredential credential = getCredentialForProvider(provider, authToken, authSecret);
++    AuthCredential credential = getCredentialForProvider(provider, authToken, authSecret, rawNonce);
+ 
+     if (credential == null) {
+       rejectPromiseWithCodeAndMessage(
+@@ -1612,11 +1612,11 @@ class ReactNativeFirebaseAuthModule extends ReactNativeFirebaseModule {
+    */
+   @ReactMethod
+   private void linkWithCredential(
+-      String appName, String provider, String authToken, String authSecret, final Promise promise) {
++      String appName, String provider, String authToken, String authSecret, @Nullable String rawNonce, final Promise promise) {
+     FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+ 
+-    AuthCredential credential = getCredentialForProvider(provider, authToken, authSecret);
++    AuthCredential credential = getCredentialForProvider(provider, authToken, authSecret, rawNonce);
+ 
+     if (credential == null) {
+       rejectPromiseWithCodeAndMessage(
+@@ -1766,11 +1766,11 @@ class ReactNativeFirebaseAuthModule extends ReactNativeFirebaseModule {
+ 
+   @ReactMethod
+   private void reauthenticateWithCredential(
+-      String appName, String provider, String authToken, String authSecret, final Promise promise) {
++      String appName, String provider, String authToken, String authSecret, @Nullable String rawNonce, final Promise promise) {
+     FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+     final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+ 
+-    AuthCredential credential = getCredentialForProvider(provider, authToken, authSecret);
++    AuthCredential credential = getCredentialForProvider(provider, authToken, authSecret, rawNonce);
+ 
+     if (credential == null) {
+       rejectPromiseWithCodeAndMessage(
+@@ -1884,9 +1884,13 @@ class ReactNativeFirebaseAuthModule extends ReactNativeFirebaseModule {
+ 
+   /** Returns an instance of AuthCredential for the specified provider */
+   private AuthCredential getCredentialForProvider(
+-      String provider, String authToken, String authSecret) {
++      String provider, String authToken, String authSecret, @Nullable String rawNonce) {
+     if (provider.startsWith("oidc.")) {
+-      return OAuthProvider.newCredentialBuilder(provider).setIdToken(authToken).build();
++      if (rawNonce != null) {
++        return OAuthProvider.newCredentialBuilder(provider).setIdTokenWithRawNonce(authToken, rawNonce).build();
++      } else {
++        return OAuthProvider.newCredentialBuilder(provider).setIdToken(authToken).build();
++      }
+     }
+     if (credentials.containsKey(authToken) && credentials.get(authToken) != null) {
+       return credentials.get(authToken);
+diff --git a/ios/RNFBAuth/RNFBAuthModule.m b/ios/RNFBAuth/RNFBAuthModule.m
+index c2531c7d22ba946bc7f73009e41cfbc8b9a883ed..f097a8bfc0395f4d6a0dbecc91874b1e44d4724e 100644
+--- a/ios/RNFBAuth/RNFBAuthModule.m
++++ b/ios/RNFBAuth/RNFBAuthModule.m
+@@ -445,6 +445,7 @@ RCT_EXPORT_METHOD(updatePhoneNumber
+         (FIRPhoneAuthCredential *)[self getCredentialForProvider:provider
+                                                            token:authToken
+                                                           secret:authSecret
++                                                        rawNonce:nil
+                                                      firebaseApp:firebaseApp];
+ 
+     if (credential == nil) {
+@@ -581,11 +582,13 @@ RCT_EXPORT_METHOD(signInWithCredential
+                   : (NSString *)provider
+                   : (NSString *)authToken
+                   : (NSString *)authSecret
++                  : (NSString *)rawNonce
+                   : (RCTPromiseResolveBlock)resolve
+                   : (RCTPromiseRejectBlock)reject) {
+   FIRAuthCredential *credential = [self getCredentialForProvider:provider
+                                                            token:authToken
+                                                           secret:authSecret
++                                                        rawNonce:rawNonce
+                                                      firebaseApp:firebaseApp];
+   if (credential == nil) {
+     [RNFBSharedUtils rejectPromiseWithUserInfo:reject
+@@ -1080,11 +1083,13 @@ RCT_EXPORT_METHOD(linkWithCredential
+                   : (NSString *)provider
+                   : (NSString *)authToken
+                   : (NSString *)authSecret
++                  : (NSString *)rawNonce
+                   : (RCTPromiseResolveBlock)resolve
+                   : (RCTPromiseRejectBlock)reject) {
+   FIRAuthCredential *credential = [self getCredentialForProvider:provider
+                                                            token:authToken
+                                                           secret:authSecret
++                                                         rawNonce:rawNonce
+                                                      firebaseApp:firebaseApp];
+ 
+   if (credential == nil) {
+@@ -1205,11 +1210,13 @@ RCT_EXPORT_METHOD(reauthenticateWithCredential
+                   : (NSString *)provider
+                   : (NSString *)authToken
+                   : (NSString *)authSecret
++                  : (NSString *)rawNonce
+                   : (RCTPromiseResolveBlock)resolve
+                   : (RCTPromiseRejectBlock)reject) {
+   FIRAuthCredential *credential = [self getCredentialForProvider:provider
+                                                            token:authToken
+                                                           secret:authSecret
++                                                         rawNonce:rawNonce
+                                                      firebaseApp:firebaseApp];
+ 
+   if (credential == nil) {
+@@ -1370,6 +1377,7 @@ RCT_EXPORT_METHOD(useEmulator
+ - (FIRAuthCredential *)getCredentialForProvider:(NSString *)provider
+                                           token:(NSString *)authToken
+                                          secret:(NSString *)authTokenSecret
++                                       rawNonce:(NSString *)rawNonce
+                                     firebaseApp:(FIRApp *)firebaseApp {
+   FIRAuthCredential *credential;
+ 
+@@ -1412,7 +1420,7 @@ RCT_EXPORT_METHOD(useEmulator
+   } else if ([provider hasPrefix:@"oidc."]) {
+     credential = [FIROAuthProvider credentialWithProviderID:provider
+                                                     IDToken:authToken
+-                                                   rawNonce:nil];
++                                                   rawNonce:rawNonce];
+   } else {
+     DLog(@"Provider not yet handled: %@", provider);
+   }
+diff --git a/lib/index.d.ts b/lib/index.d.ts
+index 7df8b9b99302ef105dafc4f979f9413b285ae13a..7db185daaf8c04a938d5228fb46afd6dfb1f0c30 100644
+--- a/lib/index.d.ts
++++ b/lib/index.d.ts
+@@ -89,6 +89,7 @@ export namespace FirebaseAuthTypes {
+     providerId: string;
+     token: string;
+     secret: string;
++    rawNonce?: string;
+   }
+ 
+   /**
+@@ -170,7 +171,7 @@ export namespace FirebaseAuthTypes {
+      * @param oidcSuffix this is the "Provider ID" value from the firebase console fx `azure_test`.
+      * @param token A provider token.
+      */
+-    credential: (oidcSuffix: string, idToken: string) => AuthCredential;
++    credential: (oidcSuffix: string, idToken: string, accessToken?: string | null, rawNonce?: string | null) => AuthCredential;
+   }
+ 
+   /**
+diff --git a/lib/index.js b/lib/index.js
+index 5ee91caebd7ea8ee020d708572495ec3266ec3aa..600ca5610f4bbb9c45a2e9b6a53f3551352c89d9 100644
+--- a/lib/index.js
++++ b/lib/index.js
+@@ -23,12 +23,12 @@ import {
+   isString,
+   isValidUrl,
+ } from '@react-native-firebase/app/lib/common';
+-import { setReactNativeModule } from '@react-native-firebase/app/lib/internal/nativeModule';
+ import {
+   FirebaseModule,
+   createModuleNamespace,
+   getFirebaseRoot,
+ } from '@react-native-firebase/app/lib/internal';
++import { setReactNativeModule } from '@react-native-firebase/app/lib/internal/nativeModule';
+ import ConfirmationResult from './ConfirmationResult';
+ import PhoneAuthListener from './PhoneAuthListener';
+ import PhoneMultiFactorGenerator from './PhoneMultiFactorGenerator';
+@@ -57,16 +57,8 @@ const PhoneAuthState = {
+ 
+ export {
+   AppleAuthProvider,
+-  EmailAuthProvider,
+-  PhoneAuthProvider,
+-  GoogleAuthProvider,
+-  GithubAuthProvider,
+-  TwitterAuthProvider,
+-  FacebookAuthProvider,
+-  PhoneMultiFactorGenerator,
+-  OAuthProvider,
+-  OIDCAuthProvider,
+-  PhoneAuthState,
++  EmailAuthProvider, FacebookAuthProvider, GithubAuthProvider, GoogleAuthProvider, OAuthProvider,
++  OIDCAuthProvider, PhoneAuthProvider, PhoneAuthState, PhoneMultiFactorGenerator, TwitterAuthProvider
+ };
+ 
+ const statics = {
+@@ -345,7 +337,7 @@ class FirebaseAuthModule extends FirebaseModule {
+ 
+   signInWithCredential(credential) {
+     return this.native
+-      .signInWithCredential(credential.providerId, credential.token, credential.secret)
++      .signInWithCredential(credential.providerId, credential.token, credential.secret, credential.rawNonce)
+       .then(userCredential => this._setUserCredential(userCredential));
+   }
+ 
+diff --git a/lib/providers/OIDCAuthProvider.js b/lib/providers/OIDCAuthProvider.js
+index d262a29548882c3b71a7bd06ebd42303e7ceca17..29f34079e4aaa0851165b1904ca9c987154488b9 100644
+--- a/lib/providers/OIDCAuthProvider.js
++++ b/lib/providers/OIDCAuthProvider.js
+@@ -26,11 +26,17 @@ export default class OIDCAuthProvider {
+     return providerId;
+   }
+ 
+-  static credential(oidcSuffix, idToken, accessToken) {
+-    return {
++  static credential(oidcSuffix, idToken, accessToken, rawNonce) {
++    const credential = {
+       token: idToken,
+       secret: accessToken,
+       providerId: providerId + oidcSuffix,
+     };
++
++    if (rawNonce) {
++      credential.rawNonce = rawNonce;
++    }
++
++    return credential;
+   }
+ }

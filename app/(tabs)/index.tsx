@@ -1,6 +1,6 @@
 import { Image } from "expo-image"
+import { useRouter } from "expo-router"
 import { Platform, StyleSheet, Text } from "react-native"
-
 import { HelloWave } from "@/components/HelloWave"
 import ParallaxScrollView from "@/components/ParallaxScrollView"
 import { ThemedText } from "@/components/ThemedText"
@@ -8,6 +8,7 @@ import { ThemedView } from "@/components/ThemedView"
 import { Button } from "@/components/ui/button"
 
 export default function HomeScreen() {
+  const router = useRouter()
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
@@ -56,8 +57,13 @@ export default function HomeScreen() {
           <ThemedText type="defaultSemiBold">app-example</ThemedText>.
         </ThemedText>
       </ThemedView>
-      <Button>
-        <Text>Button</Text>
+      <Button
+        onPress={() => {
+          console.log("onPress")
+          router.push("/(auth)/login")
+        }}
+      >
+        <Text>Login</Text>
       </Button>
     </ParallaxScrollView>
   )

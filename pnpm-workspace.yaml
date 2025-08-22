@@ -2,3 +2,4 @@ nodeLinker: hoisted
 
 patchedDependencies:
   '@react-native-firebase/app': patches/@react-native-firebase__app.patch
+  '@react-native-firebase/auth': patches/@react-native-firebase__auth.patch

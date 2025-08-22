@@ -19,6 +19,7 @@ const config = {
       edgeToEdgeEnabled: true,
       package: "com.tododev.todo01",
       googleServicesFile: "google-services.json",
+      softwareKeyboardLayoutMode: "pan",
     },
     web: {
       bundler: "metro",
