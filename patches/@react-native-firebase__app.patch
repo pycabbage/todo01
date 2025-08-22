@@ -1,0 +1,13 @@
+diff --git a/package.json b/package.json
+index f493b75fe5aac4043da3581077d3e527b1f8f318..74689c3545d18eaad78210c2bc8ea2b28b4f6950 100644
+--- a/package.json
++++ b/package.json
+@@ -88,7 +88,7 @@
+       "firebasePerfGradle": "2.0.1",
+       "gmsGoogleServicesGradle": "4.4.3",
+       "playServicesAuth": "21.4.0",
+-      "firebaseAppDistributionGradle": "5.1.2"
++      "firebaseAppDistributionGradle": "5.1.1"
+     }
+   },
+   "gitHead": "b152d06e706e499464829f856804e29565118cc5"

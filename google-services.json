@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "426038320494",
+    "project_id": "expo-test-01-34e28",
+    "storage_bucket": "expo-test-01-34e28.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:426038320494:android:127af63f2c17ab9c69757f",
+        "android_client_info": {
+          "package_name": "com.tododev.todo01"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlwcOCP4yngDmYv8tdy-T8IXYV1VJZ-uU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
