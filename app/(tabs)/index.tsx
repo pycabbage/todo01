@@ -1,5 +1,5 @@
 import { Image } from "expo-image"
-import { Platform, StyleSheet } from "react-native"
+import { Platform, StyleSheet, Text } from "react-native"
 
 import { HelloWave } from "@/components/HelloWave"
 import ParallaxScrollView from "@/components/ParallaxScrollView"
@@ -45,6 +45,7 @@ export default function HomeScreen() {
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
+        <Text className="text-xl font-bold text-blue-500">hello!</Text>
         <ThemedText>
           {`When you're ready, run `}
           <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText>{" "}

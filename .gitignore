@@ -45,3 +45,5 @@ app-example
 
 /android/
 /ios/
+
+nativewind-env.d.ts
